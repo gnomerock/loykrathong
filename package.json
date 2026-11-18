@@ -1,0 +1,16 @@
+{
+  "name": "loy-krathong-2569-idle",
+  "version": "1.0.0",
+  "description": "Loy Krathong 2569 idle game (three.js, 2.5HD) driven by TikTok LIVE events",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "demo": "node server.js --demo"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "tiktok-live-connector": "^2.5.0",
+    "ws": "^8.18.0"
+  }
+}

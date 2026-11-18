@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07182b">
+<title>ลอยกระทง 2569 · Loy Krathong Idle</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "./lib/three.module.min.js" } }</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="vignette"></div>
+  <div id="labels"></div>
+  <div id="pops"></div>
+
+  <div id="hud">
+    <header>
+      <div class="title"><b>ลอยกระทง</b><i>2569</i></div>
+      <div class="stats">
+        <div class="pill merit"><span class="ic">✨</span><span id="merit">0</span><small>บุญ</small></div>
+        <div class="pill"><span class="ic">🪷</span><span id="kcount">0</span></div>
+        <div class="pill"><span class="ic">👀</span><span id="viewers">0</span></div>
+        <div id="conn" class="dot off" title="TikTok"></div>
+      </div>
+      <div class="rate" id="rate"></div>
+    </header>
+
+    <ul id="feed"></ul>
+
+    <footer>
+      <div id="shop"></div>
+      <button id="gear" aria-label="settings">⚙</button>
+    </footer>
+  </div>
+
+  <section id="settings" class="hidden">
+    <h3>TikTok LIVE <button id="closeSet">✕</button></h3>
+    <label>Relay (WebSocket)
+      <input id="wsUrl" type="text" spellcheck="false">
+    </label>
+    <div class="row"><button id="wsGo">เชื่อมต่อ</button><span id="wsState">—</span></div>
+    <p class="hint">รัน <code>node server.js &lt;tiktok_username&gt;</code> บนเครื่อง แล้วเปิดหน้านี้จาก server เดิม</p>
+    <h4>ทดสอบอีเวนต์</h4>
+    <div class="grid">
+      <button data-ev="chat">💬 chat</button>
+      <button data-ev="follow">💛 follow</button>
+      <button data-ev="join">👋 join</button>
+      <button data-ev="like">❤ like</button>
+      <button data-ev="share">↗ share</button>
+      <button data-ev="gift">🎁 gift</button>
+    </div>
+    <div class="row"><button id="musicBtn">🎵 เพลง</button><button id="muteBtn">🔊 เอฟเฟกต์</button><button id="resetBtn" class="danger">รีเซ็ตเซฟ</button></div>
+  </section>
+</div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
