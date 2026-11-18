@@ -48,3 +48,17 @@ Progress is saved in localStorage, with offline earnings (max 8 h).
 Background, characters, krathongs and lanterns are painted 2D (Ghibli-like + chibi). They live inside a real 3D scene:
 perspective camera drift gives parallax, the river is a shader, lamps/candles/moon are additive glows, characters are billboarded sprites with
 moonlight/lamp tinting. Characters use 4 male + 4 female painted sprites with procedural walk/hop/bend/pray animation (no frame-by-frame animation yet).
+
+## OBS Browser Source (overlay on your TikTok LIVE)
+The game page can be hosted anywhere (GitHub Pages / itch.io), but the TikTok connector only runs in Node, so TikTok events come from the small relay on **the PC that runs OBS**:
+
+1. On that PC: `node server.js <your_tiktok_username>` (or `start.bat`). Keep it running while you are live.
+2. OBS -> Sources -> **+ Browser** -> URL: your hosted page + `?hud=0`
+   (e.g. `https://<user>.github.io/loykrathong/?hud=0`, or just `http://localhost:8080/?hud=0` straight from the relay).
+3. Width **1080**, Height **1920** for a portrait game scene (any size works; the 9:16 stage is centred and the rest stays transparent).
+   Tick *Control audio via OBS* to get the music in the OBS mixer.
+4. The page finds the relay at `ws://localhost:8080/ws` automatically when it is hosted on github.io / itch.io.
+   Another port or PC: add `&ws=ws://HOST:PORT/ws`.
+
+Useful flags: `?hud=0` (no UI, transparent page) · `?music=0` (no music) · `?demo=1` (fake viewers, no relay).
+If the music does not start, right-click the source -> **Interact** and click once (browsers require a click before sound).

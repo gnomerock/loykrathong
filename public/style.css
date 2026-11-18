@@ -70,3 +70,8 @@ footer{display:flex;align-items:flex-end;gap:2cqw}
 
 /* layering: labels under HUD/settings */
 #labels{z-index:5}#pops{z-index:6}#hud{z-index:10}
+
+/* OBS / overlay mode (?hud=0): transparent page so a non-9:16 browser source shows what is behind it, no cursor */
+body.nohud,body.nohud html{background:transparent}
+html:has(body.nohud){background:transparent}
+body.nohud{cursor:none}
