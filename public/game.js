@@ -487,7 +487,7 @@ let demoTimer = 0;
 if (Q.get('demo') === '1') demoTimer = setInterval(() => { const r = Math.random(); fire(r < 0.4 ? 'chat' : r < 0.55 ? 'join' : r < 0.75 ? 'follow' : r < 0.88 ? 'like' : r < 0.94 ? 'share' : 'gift'); }, 1500);
 
 /* ---------------------------------------------------------------- relay websocket */
-const HOSTED = /itch\.(zone|io)$|\.itch\./.test(location.hostname);   // static hosting (itch.io): no relay on the same host -> use the streamer's local relay
+const HOSTED = /itch\.(zone|io)$|\.itch\.|github\.io$/.test(location.hostname);   // static hosting (itch.io / GitHub Pages): no relay on the same host -> use the streamer's local relay
 let ws = null, wsUrl = Q.get('ws') || (location.protocol.startsWith('http') && !HOSTED ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : 'ws://localhost:8080/ws'), wsWant = Q.get('demo') !== '1';
 const connDot = $('#conn'), wsState = $('#wsState');
 function setConn(m) {
