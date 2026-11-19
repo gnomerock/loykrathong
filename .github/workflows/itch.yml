@@ -1,0 +1,36 @@
+name: Deploy to itch.io
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: itch
+  cancel-in-progress: false
+permissions:
+  contents: read
+env:
+  ITCH_TARGET: gnomerock/loykrathong-tt:html5
+jobs:
+  butler-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check secret
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          if [ -z "$BUTLER_API_KEY" ]; then
+            echo "::error::Repository secret BUTLER_API_KEY is missing. Add it in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+      - name: Install butler
+        run: |
+          curl -fsSL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d "$RUNNER_TEMP/butler"
+          chmod +x "$RUNNER_TEMP/butler/butler"
+          "$RUNNER_TEMP/butler/butler" -V
+      - name: Push public/ to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          "$RUNNER_TEMP/butler/butler" push public "$ITCH_TARGET" --userversion "${GITHUB_SHA::7}"
