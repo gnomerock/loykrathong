@@ -66,3 +66,6 @@ If the music does not start, right-click the source -> **Interact** and click on
 ## CI / deploy
 - Push or merge to `main` -> GitHub Action **Deploy to itch.io** (`.github/workflows/itch.yml`) runs `butler push public gnomerock/loykrathong-tt:html5`. Needs the repository secret `BUTLER_API_KEY` (itch.io API key).
 - Push to `main` also runs **Deploy to GitHub Pages** (`.github/workflows/pages.yml`) once Pages is enabled (Settings > Pages > Source: GitHub Actions).
+
+## Fonts
+UI font: [Playpen Sans Thai](https://fonts.google.com/specimen/Playpen+Sans+Thai) (SIL Open Font License 1.1, see `public/fonts/OFL.txt`), subset to Thai + Latin and self-hosted in `public/fonts/`.
