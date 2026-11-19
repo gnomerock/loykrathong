@@ -62,3 +62,7 @@ The game page can be hosted anywhere (GitHub Pages / itch.io), but the TikTok co
 
 Useful flags: `?hud=0` (no UI, transparent page) · `?music=0` (no music) · `?demo=1` (fake viewers, no relay).
 If the music does not start, right-click the source -> **Interact** and click once (browsers require a click before sound).
+
+## CI / deploy
+- Push or merge to `main` -> GitHub Action **Deploy to itch.io** (`.github/workflows/itch.yml`) runs `butler push public gnomerock/loykrathong-tt:html5`. Needs the repository secret `BUTLER_API_KEY` (itch.io API key).
+- Push to `main` also runs **Deploy to GitHub Pages** (`.github/workflows/pages.yml`) once Pages is enabled (Settings > Pages > Source: GitHub Actions).
