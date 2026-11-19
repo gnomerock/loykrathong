@@ -45,9 +45,10 @@ Progress is saved in localStorage, with offline earnings (max 8 h).
 - `tools/process_assets.py` cuts the Image Gen sprite sheets (magenta background) into transparent PNGs
 
 ## Art notes
-Background, characters, krathongs and lanterns are painted 2D (Ghibli-like + chibi). They live inside a real 3D scene:
-perspective camera drift gives parallax, the river is a shader, lamps/candles/moon are additive glows, characters are billboarded sprites with
-moonlight/lamp tinting. Characters use 4 male + 4 female painted sprites with procedural walk/hop/bend/pray animation (no frame-by-frame animation yet).
+Style: **3D folded-paper sculpture** (origami look, soft real paper shadows) for the background, characters, krathongs and sky lanterns (generated with Image Gen).
+They live inside a real 3D scene: a perspective camera drift gives parallax, the river is a shader, lamps/candles/moon are additive glows, characters are billboarded sprites with
+moonlight/lamp tinting. 4 male + 4 female sprites with procedural walk/hop/bend/pray animation (no frame-by-frame animation).
+To swap art: put the 5 source images in a folder and run `python tools/process_assets.py <source_dir> public/assets`, then adjust the layout constants at the top of `public/game.js` (`PIER_SLOTS`, `groundY`, `buildGlows`) to match the new painting.
 
 ## OBS Browser Source (overlay on your TikTok LIVE)
 The game page can be hosted anywhere (GitHub Pages / itch.io), but the TikTok connector only runs in Node, so TikTok events come from the small relay on **the PC that runs OBS**:

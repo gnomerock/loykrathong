@@ -19,13 +19,14 @@ const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 /* ---------------------------------------------------------------- scene layout (bg pixel coordinates) */
-const WATER_Y = 1000;                             // below this = river
-const PIER_SLOTS = [548, 590, 632];               // x where a character stands to float a krathong
+const WATER_Y = 935;                              // below this = river (tap to float your own krathong)
+const PIER_SLOTS = [625, 675, 725];               // x where a character stands on the pier deck to float a krathong
 const ENTER_X = -80;
 const groundY = (x, lane) => {                    // lane 0 = back .. 1 = front, returns bg-pixel y of the feet
-  const promenade = 838 + lane * 30;
-  const deck = 858 + clamp(x - 440, 0, 400) * 0.115 + lane * 14;
-  return lerp(promenade, deck, smooth(420, 470, x));
+  const back = 806 - x * 0.03, front = 872 - x * 0.045;          // cobblestone promenade (slopes up to the right)
+  const promenade = lerp(back, front, lane);
+  const deck = 836 + lane * 30;                                  // wooden pier deck
+  return lerp(promenade, deck, smooth(470, 590, x));
 };
 
 /* ---------------------------------------------------------------- three.js setup */
@@ -82,9 +83,10 @@ function buildBackground() {
       uniform sampler2D map; uniform float time; varying vec2 vUv;
       void main(){
         vec2 uv = vUv; float yT = 1.0 - uv.y;
-        float w = smoothstep(0.715, 0.775, yT);
-        float depth = clamp((yT - 0.715) / 0.285, 0.0, 1.0);
-        float amp = w * (0.0007 + 0.0042 * depth);
+        float top = 0.716 - 0.062 * clamp(uv.x / 0.65, 0.0, 1.0);
+        float w = smoothstep(top, top + 0.045, yT);
+        float depth = clamp((yT - top) / 0.3, 0.0, 1.0);
+        float amp = w * (0.0005 + 0.0034 * depth);
         float wave = sin(yT * 130.0 - time * 1.25 + sin(uv.x * 9.0 + time * 0.4) * 2.0);
         uv.x += wave * amp + sin(uv.x * 28.0 + time * 0.8 + yT * 40.0) * amp * 0.4;
         uv.y += cos(yT * 85.0 - time * 0.9) * amp * 0.35;
@@ -109,12 +111,13 @@ function addGlow(px, py, size, color, opts = {}) {
   return s;
 }
 function buildGlows() {
-  addGlow(516, 190, 520, 0xaad4ff, { opacity: 0.32, flicker: 0.04, speed: 0.4 });                // moon halo
-  addGlow(510, 1092, 230, 0xcfe6ff, { opacity: 0.22, flicker: 0.1, speed: 0.8 });                  // moon reflection
-  [[522, 782], [609, 826], [724, 813]].forEach(([x, y]) => { addGlow(x, y, 120, 0xffb347, { opacity: 0.85 }); addGlow(x, y + 190, 100, 0xff9a3a, { opacity: 0.25, flicker: 0.3 }); }); // pier lamps + reflection
-  [[338, 690], [376, 690], [416, 688], [312, 668]].forEach(([x, y]) => addGlow(x, y, 70, 0xffa43a, { opacity: 0.55, flicker: 0.1 }));  // ubosot windows
-  [[23, 553], [85, 590], [125, 600], [157, 575], [18, 665], [40, 690]].forEach(([x, y]) => addGlow(x, y, 78, 0xffa347, { opacity: 0.55 })); // hanging lanterns
-  [[210, 640], [260, 700]].forEach(([x, y]) => addGlow(x, y, 160, 0xffc766, { opacity: 0.18, flicker: 0.06 }));                       // stupa warmth
+  addGlow(520, 190, 540, 0xaad4ff, { opacity: 0.30, flicker: 0.04, speed: 0.4 });                  // moon halo
+  addGlow(500, 985, 260, 0xfff0c8, { opacity: 0.20, flicker: 0.1, speed: 0.8 });                   // moon reflection
+  [[634, 742], [741, 727]].forEach(([x, y]) => { addGlow(x, y, 130, 0xffb347, { opacity: 0.85 }); addGlow(x, 940, 110, 0xff9a3a, { opacity: 0.22, flicker: 0.3 }); }); // pier lamps + reflections
+  [[293, 660], [329, 668], [368, 672], [440, 668]].forEach(([x, y]) => addGlow(x, y, 80, 0xffa43a, { opacity: 0.5, flicker: 0.1 }));       // ubosot windows
+  [[38, 687], [77, 680], [110, 655], [190, 668], [232, 662], [62, 432], [92, 410], [115, 388], [229, 379], [259, 407], [289, 430], [562, 652], [590, 641]]
+    .forEach(([x, y]) => addGlow(x, y, 70, 0xffa347, { opacity: 0.5 }));                                                                       // hanging lanterns
+  [[170, 470], [190, 600]].forEach(([x, y]) => addGlow(x, y, 200, 0xffc766, { opacity: 0.14, flicker: 0.06 }));                                  // stupa warmth
 }
 
 /* ---------------------------------------------------------------- particles & fireflies */
@@ -256,7 +259,7 @@ function chime(freqs = [880], vol = 0.05) {
 const krathongs = [];
 function dropKrathong(x0, y0, x1, y1, opts = {}) {
   const key = opts.key || 'k' + (1 + ((Math.random() * 4) | 0)); const [w, h] = MAN[key];
-  const gold = !!opts.gold, size = (gold ? 130 : 80) * rand(0.92, 1.08);
+  const gold = !!opts.gold, size = (gold ? 112 : 66) * rand(0.92, 1.08);
   const body = new THREE.Mesh(quadB, mkMat(A[key])); body.renderOrder = 200; scene.add(body);
   const refl = new THREE.Mesh(quadB, mkMat(A[key], { opacity: 0.22, color: 0x7fb4ff })); refl.renderOrder = 120; scene.add(refl);
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: gold ? 0xffd34a : 0xffa94a, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0.8 })); halo.renderOrder = 3050; scene.add(halo);
@@ -276,9 +279,9 @@ function updateKrathongs(dt, t) {
         ripple(k.x, k.y);
       }
     } else { k.x -= k.drift * dt; k.y += k.sink * dt; xx = k.x; yy = k.y + Math.sin(t * 1.7 + k.ph) * 1.4; }
-    if (k.age > k.life || k.y > 1215) k.fading = true;
+    if (k.age > k.life || k.y > 1180) k.fading = true;
     if (k.fading) { k.fade = (k.fade ?? 1) - dt * 0.4; a = Math.max(k.fade, 0); if (a <= 0) { scene.remove(k.body, k.refl, k.halo); k.body.material.dispose(); k.refl.material.dispose(); k.halo.material.dispose(); krathongs.splice(i, 1); continue; } }
-    const sc = lerp(0.55, 1.35, clamp((yy - 1000) / 380, 0, 1)) * (k.phase === 'fall' ? 1.05 : 1);
+    const sc = lerp(0.6, 1.4, clamp((yy - 920) / 440, 0, 1)) * (k.phase === 'fall' ? 1.05 : 1);
     const H = k.size * sc, Wd = H * k.ar;
     const wp = W(xx, yy, 20);
     k.body.position.set(wp.x, wp.y, 20); k.body.scale.set(Wd, H, 1); k.body.rotation.z = Math.sin(t * 1.3 + k.ph) * 0.05;
@@ -306,7 +309,7 @@ const chars = [];
 const byUser = new Map();
 const slotOwner = PIER_SLOTS.map(() => null);
 const MAX_CHARS = 14;
-const REF_H = 415, CHAR_H = 205;
+const REF_H = 415, CHAR_H = 150;
 const labels = new Map();
 
 class Char {
@@ -315,7 +318,7 @@ class Char {
     const id = this.user ? this.user.id : String(Math.random());
     const hh = hash(id);
     this.gender = opts.gender || (hh & 1 ? 'f' : 'm');
-    this.variant = opts.variant || (1 + ((hh >> 1) % 4));
+    this.variant = opts.variant || (1 + ((hh >>> 1) % 4));
     this.key = this.gender + this.variant;
     const [w, h] = MAN[this.key]; this.H = CHAR_H * (h / REF_H); this.Wd = this.H * w / h;
     this.lane = this.laneGoal = rand(0.05, 0.95); this.x = ENTER_X; this.state = 'enter'; this.t = 0; this.phase = rand(0, 6.28); this.dir = 1;
@@ -383,7 +386,7 @@ class Char {
         this.dir = 1; const u = this.t;
         if (!this.released && u > 1.0) {
           this.released = true; const job = this.queue.shift() || {}; const hand = this.handPos();
-          const tx = this.x + rand(34, 70), ty = rand(1008, 1040);
+          const tx = this.x + rand(30, 70), ty = rand(950, 1010);
           dropKrathong(hand.x, hand.y, tx, ty, { gold: job.gold, value: job.value ?? floatValue(), fall: 0.95, key: this.carryKey });
           this.carryM.visible = this.carryHalo.visible = false; this.carry = false;
           if (job.gold) { spark(hand.x, hand.y, 24, 0xffe27a, 90); for (let i = 0; i < (job.lanterns ?? 4); i++) setTimeout(() => launchLantern(this.x + rand(-60, 60), rand(620, 760)), i * 140); }
@@ -402,14 +405,14 @@ class Char {
   }
   handPos() { return { x: this.x + 44, y: this.y() - this.H * 0.16 }; }
   apply(dt, t = 0) {
-    const y = this.y(), lane = clamp((y - 836) / 70, 0, 1);
+    const y = this.y(), lane = clamp((y - 800) / 90, 0, 1);
     const sc = 0.95 + 0.1 * clamp((this.lane), 0, 1) * (this.x < 440 ? 1 : 0.5);
     let bob = 0, rot = 0, sy = 1, sx = 1;
     const moving = this.state === 'walk';
     if (moving) { const s = Math.sin(this.phase * 1); bob = Math.abs(s) * 5 * sc; rot = s * 0.055; sy = 1 + Math.abs(s) * 0.025; }
     else { sy = 1 + Math.sin(this.phase) * 0.012; }
     if (this.hopT > 0) { this.hopT += dt; const u = this.hopT / 0.55; if (u >= 1) this.hopT = 0; else { bob += Math.sin(u * Math.PI) * 26; sy *= 1 + Math.sin(u * Math.PI) * 0.06; } }
-    let cx = 0, cy = this.carry ? this.H * 0.36 : 0, cs = 0.28;
+    let cx = 0, cy = this.carry ? this.H * 0.36 : 0, cs = 0.3;
     if (this.state === 'float') {
       const u = this.t;
       const bend = u < 0.7 ? smooth(0, 0.7, u) : u < 1.5 ? 1 : u < 2.0 ? 1 - smooth(1.5, 2.0, u) : 0;
